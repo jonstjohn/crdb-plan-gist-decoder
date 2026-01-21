@@ -31,13 +31,13 @@ crdb-plan-gist-decoder 'AgHgAQIA/wMCAAAHFAUUIeABAAAFDAYM'
 Output:
 ```
   • update
-  │ table: ?
+  │ table: 112
   │ set
   │
   └── • render
       │
       └── • scan
-            table: ?@?
+            table: 112@1
             spans: 1+ spans
 ```
 
@@ -74,7 +74,7 @@ import (
 func main() {
     gistString := "AgHgAQIA/wMCAAAHFAUUIeABAAAFDAYM"
 
-    // Decode the gist (table/index names will show as "?")
+    // Decode the gist (table/index IDs will be shown as numbers)
     node, err := gist.DecodePlanGist(gistString, nil, nil)
     if err != nil {
         log.Fatalf("Error decoding gist: %v", err)
@@ -156,8 +156,8 @@ func DecodePlanGist(gist string, tableLookup TableLookupFunc, indexLookup IndexL
 Decodes a base64-encoded plan gist into a plan tree.
 
 - `gist`: The base64-encoded gist string
-- `tableLookup`: Optional function to resolve table IDs to names (can be `nil`)
-- `indexLookup`: Optional function to resolve index IDs to names (can be `nil`)
+- `tableLookup`: Optional function to resolve table IDs to names (can be `nil`; IDs will be shown as numbers if not provided)
+- `indexLookup`: Optional function to resolve index IDs to names (can be `nil`; IDs will be shown as numbers if not provided)
 - Returns: Root node of the plan tree and any error
 
 **FormatPlan**
@@ -178,7 +178,7 @@ type TableLookupFunc func(id int64) string
 type IndexLookupFunc func(tableID int64, indexID int64) string
 ```
 
-Both functions should return an empty string for unknown IDs (will display as "?").
+Both functions should return an empty string for unknown IDs. When a lookup function returns an empty string or is `nil`, the numeric ID will be displayed instead (e.g., `112@1` instead of `users@users_pkey`).
 
 ## Example Output
 

@@ -66,12 +66,18 @@ func TestDecodePlanGistWithLookup(t *testing.T) {
 		t.Fatalf("Failed to decode: %v", err)
 	}
 
-	// Navigate to the scan node (update -> render -> scan)
+	// Navigate to the scan node (update -> simple project -> render -> scan)
 	if len(node.children) == 0 {
 		t.Fatal("Expected children in update node")
 	}
 
-	renderNode := node.children[0]
+	// The actual tree has a simple project node (which is skipped in formatted output)
+	projectNode := node.children[0]
+	if len(projectNode.children) == 0 {
+		t.Fatal("Expected children in project node")
+	}
+
+	renderNode := projectNode.children[0]
 	if len(renderNode.children) == 0 {
 		t.Fatal("Expected children in render node")
 	}
@@ -114,11 +120,11 @@ func TestFormatPlan(t *testing.T) {
 	// Check for expected output elements
 	expectedStrings := []string{
 		"• update",
-		"table: ?",
+		"table: 112",
 		"set",
 		"• render",
 		"• scan",
-		"table: ?@?",
+		"table: 112@1",
 		"spans: 1+ spans",
 	}
 

@@ -20,7 +20,7 @@ func main() {
 
 	gistString := os.Args[1]
 
-	// Default lookup functions return empty string (displays "?")
+	// Default lookup functions return empty string (displays numeric IDs)
 	// You can customize these to provide actual table/index names
 	tableLookup := func(id int64) string {
 		return ""

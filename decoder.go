@@ -16,11 +16,11 @@ import (
 const gistVersion = 1
 
 // TableLookupFunc resolves CockroachDB internal table IDs to table names.
-// Return an empty string to display "?" for unknown tables.
+// Return an empty string to display the numeric ID for unknown tables.
 type TableLookupFunc func(id int64) string
 
 // IndexLookupFunc resolves CockroachDB internal index IDs to index names.
-// Return an empty string to display "?" for unknown indexes.
+// Return an empty string to display the numeric ID for unknown indexes.
 type IndexLookupFunc func(tableID int64, indexID int64) string
 
 // Node represents a decoded plan node in the query execution tree.
@@ -66,7 +66,7 @@ func (d *planGistDecoder) decodeID() int64 {
 
 func (d *planGistDecoder) decodeTable() (int64, string) {
 	id := d.decodeID()
-	name := "?"
+	name := fmt.Sprintf("%d", id) // Default to showing the ID
 	if d.TableLookupFn != nil {
 		if n := d.TableLookupFn(id); n != "" {
 			name = n
@@ -77,7 +77,7 @@ func (d *planGistDecoder) decodeTable() (int64, string) {
 
 func (d *planGistDecoder) decodeIndex(tableID int64) (int64, string) {
 	id := d.decodeID()
-	name := "?"
+	name := fmt.Sprintf("%d", id) // Default to showing the ID
 	if d.IndexLookupFn != nil {
 		if n := d.IndexLookupFn(tableID, id); n != "" {
 			name = n
@@ -370,9 +370,9 @@ func (d *planGistDecoder) decodeOp() execOperator {
 
 // DecodePlanGist decodes a base64-encoded CockroachDB plan gist into a plan tree.
 //
-// The tableLookup and indexLookup functions are optional. If nil, table and index
-// names will be shown as "?". These functions should map CockroachDB internal IDs
-// to human-readable names.
+// The tableLookup and indexLookup functions are optional. If nil or if they return
+// an empty string, table and index IDs will be shown as numbers (e.g., "112@1").
+// These functions should map CockroachDB internal IDs to human-readable names.
 //
 // Example:
 //

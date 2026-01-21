@@ -142,13 +142,13 @@ func formatNode(n *Node, prefix string, isLast bool) string {
 // Output:
 //
 //	  • update
-//	  │ table: ?
+//	  │ table: 112
 //	  │ set
 //	  │
 //	  └── • render
 //	      │
 //	      └── • scan
-//	            table: ?@?
+//	            table: 112@1
 //	            spans: 1+ spans
 func FormatPlan(n *Node) string {
 	if n == nil {
